@@ -4,6 +4,11 @@ from random import randint
 class Vehicle:
 
     def __init__(self, capacity=1000, maximum_trip=8):
+        """
+        Construct a vehicle
+        :param capacity: maximum load capacity 
+        :param maximum_trip: maximum trip time per session
+        """
         self.capacity = capacity
         self.maximum_trip = maximum_trip
         self.goods = capacity
@@ -41,11 +46,21 @@ class Vehicle:
         return travel_time
 
     def reset(self):
+        """
+        Reset the values of the vehicle(unused if new vehicles are created)
+        :return: void
+        """
         self.past_path = []
         self.tot_time = 0
         self.tot_cost = 0
 
     def visit_path(self,roadmap, path):
+        """
+        Visit a stated path 
+        :param roadmap: the set of nodes
+        :param path: the subset of nodes to visit
+        :return: void
+        """
         self.reset()
         for node in path:
             self.past_path.append(node)
