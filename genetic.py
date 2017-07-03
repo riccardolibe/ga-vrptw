@@ -1,16 +1,10 @@
-from parent import Parent
+from individual import Individual
+from environment import Environment
 
+env = Environment(5,2)
 
-class Genetic:
+dna = [[1,2,3,4,5],[1,2,3,4,5]]
 
-    def __init__(self, environment):
-        """
-        Construct a genetic environment
-        :param environment: 
-        """
-        self.population = []
-        self.environment = environment
+ind = Individual(env,dna)
 
-    def generate_population(self, pop_size):
-        for i in range(pop_size):
-            self.population.append(Parent(self.environment))
+print(ind.dna, ind.fitness)

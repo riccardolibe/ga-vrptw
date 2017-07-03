@@ -3,70 +3,53 @@ from random import randint
 
 class Vehicle:
 
-    def __init__(self, capacity=1000, maximum_trip=8):
-        """
-        Construct a vehicle
-        :param capacity: maximum load capacity 
-        :param maximum_trip: maximum trip time per session
-        """
+    def __init__(self, capacity=500):
         self.capacity = capacity
-        self.maximum_trip = maximum_trip
         self.goods = capacity
         self.position = 0
-        self.past_path = []
-        self.tot_time = 0
-        self.tot_cost = 0
+        self.path = []
+        self.target = 0
+        self.traveled_path = []
+        self.total_travel_time = 0
+        self.travel_time_to_target = 0
 
-    def unload(self, customer, time):
+    def deliver(self, roadmap):
         """
         Checks available goods and delivers
         """
-        t1 = customer.time_window[0]
-        t2 = customer.time_window[1]
-        if self.goods >= customer.demand and \
-                        t1 <= time and \
-                        time <= t2  :
+        customer = roadmap.get_customer(self.position)
 
-            self.goods = self.goods - customer.demand
-            return True
+        #if self.goods >= customer.demand:
+        #    self.goods = self.goods - customer.demand
+        customer.demand = 0
+
+        self.total_travel_time += 1
+
+    def wait(self):
+        self.total_travel_time += 1
+
+    def travel(self):
+        if self.travel_time_to_target != 0:
+            self.travel_time_to_target -= 1
+            self.total_travel_time += 1
         else:
-            return False
+            self.traveled_path.append(self.position)
+            self.position = self.target
 
-    def visit_next(self, roadmap):
-        """
-        Visits a random next neighbour, store the old position
-        """
-        neighbors = roadmap.map.neighbors(self.position)
+    def set_random_next_target(self, roadmap):
+        neighbors = roadmap.get_neighbors(self.position)
         i = randint(0, len(neighbors)-1)
-        self.past_path.append(self.position)
-        travel_time = roadmap.map[self.position][neighbors[i]]['travel_time']
-        self.tot_time += travel_time
-        self.tot_cost += roadmap.map[self.position][neighbors[i]]['cost']
-        self.position = neighbors[i]
-        return travel_time
+        self.travel_time_to_target = roadmap.get_travel_time(self.position,neighbors[i])
+        self.target = neighbors[i]
+        #    if self.target == 0:
+        #        self.goods = self.capacity
 
-    def reset(self):
-        """
-        Reset the values of the vehicle(unused if new vehicles are created)
-        :return: void
-        """
-        self.past_path = []
-        self.tot_time = 0
-        self.tot_cost = 0
+    def set_next_target(self, roadmap):
+        if self.path:
+            self.target = self.path.pop()
+            self.travel_time_to_target = roadmap.get_travel_time(self.position, self.target)
 
-    def visit_path(self,roadmap, path):
-        """
-        Visit a stated path 
-        :param roadmap: the set of nodes
-        :param path: the subset of nodes to visit
-        :return: void
-        """
-        self.reset()
-        for node in path:
-            self.past_path.append(node)
-            self.tot_time += roadmap.map[self.position][node]['travel_time']
-            self.tot_cost = roadmap.map[self.position][node]['cost']
-            self.position = node
-
-
-
+    def set_path(self, p):
+        self.path = p
+        self.path.reverse()
+        self.path.pop()

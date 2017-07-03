@@ -1,16 +1,11 @@
-from numpy.random import normal
+from random import randint, gauss
 
 
 class Customer:
 
     def __init__(self, demand=0, time_window=(0, 0)):
-        """
-        Construct a new customer
-        :param demand: quantity of goods needed
-        :param time_window: window of time in which is possible to receive goods
-        """
-        self.demand = demand
-        self.time_window = time_window
+        self.demand = randint(50, 100)
+        self.set_time_window(12, 4)
 
     def set_time_window(self, mean, variance):
         """
@@ -22,16 +17,10 @@ class Customer:
         """
         t1, t2 = 0, 0
         while t1 <= 0:
-            t1 = int(normal(mean-1, variance, 1))
+            t1 = int(gauss(mean-1, variance)) % 24
         while t2 <= t1:
-            t2 = int(normal(mean+1, variance, 1))
-        self.time_window = (t1, t2)
+            t2 = int(gauss(mean+1, variance)) % 24
+        self.time_window = range(t1, t2+1)
 
-    def receive_goods(self, roadmap):
-        """
-        Decrease the customer demand to 0 and the general demand by the units of goods 
-        :param roadmap: set of nodes
-        :return: void
-        """
-        roadmap.total_demand -= self.demand
+    def receive(self):
         self.demand = 0

@@ -1,49 +1,42 @@
 import networkx as nx
-import random
-from random import randint
+from random import *
 import matplotlib.pyplot as plt
 from customer import Customer
 from networkx import Graph
-from numpy.random import normal
+
 
 class RoadMap(Graph):
 
     def __init__(self, n):
-        self.total_demand = 0
-        self.map = nx.gnp_random_graph(n, random.random())
-        self.set_time()
-        self.set_cost()
+        self.map = nx.geographical_threshold_graph(n, 0)
+        self.set_travel_time()
+        self.set_travel_cost()
         self.set_customers()
 
     def show_map(self):
-        """
-        Plot the graph in the standard output
-        """
         nx.draw(self.map)
         plt.show()
 
-    def set_time(self):
-        """
-        Set time cost for every edge
-        """
+    def set_travel_time(self):
         for i, j in self.map.edges():
-            self.map[i][j]['travel_time'] = randint(0, 20)
+            self.map[i][j]['travel_time'] = randint(1, 10)
 
-    def set_cost(self):
-        """
-        Set the cost of an edge in fuction of the time cost
-        """
-        #todo migliorare la funzione del costo in fuznione del tempo
+    def set_travel_cost(self):
         for i, j in self.map.edges():
-            self.map[i][j]['cost'] = int(normal(0.2 * self.map[i][j]['travel_time']))
+            self.map[i][j]['cost'] = int(0.2 * self.map[i][j]['travel_time'])
 
     def set_customers(self):
-        """
-        For every node in roadmap, assign a customer
-        """
         for i in self.map.nodes():
-            demand = randint(0, 100)
-            self.total_demand = self.total_demand + demand
-            customer = Customer(demand)
-            customer.set_time_window(12, 8)
-            self.map.node[i]['customer'] = customer
+            self.map.node[i]['customer'] = Customer()
+
+    def get_customer(self, node):
+        return self.map.node[node]['customer']
+
+    def get_travel_time(self, position, destination):
+        return self.map[position][destination]['travel_time']
+
+    def get_nodes(self):
+        return self.map.nodes()
+
+    def get_neighbors(self, node):
+        return self.map.neighbors(node)
